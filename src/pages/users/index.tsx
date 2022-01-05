@@ -1,11 +1,20 @@
-import { Box, Flex, Heading, Button, Icon, Table, Thead, Tbody, Tr, Th, Td, Checkbox, Text, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Flex, Heading, Button, Icon, Table, Thead, Tbody, Tr, Th, Td, Checkbox, Text, useBreakpointValue, Spinner } from "@chakra-ui/react";
 import Link from "next/link";
+import { useQuery } from 'react-query';
+
 import { RiAddLine, RiPencilLine, RiDeleteBinLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
 
 export default function UserList() {
+
+    const { data, isLoading, error } = useQuery('users', async () => {
+        const response = await fetch('http://localhost:3000/api/users')
+        const data = await response.json()
+
+        return data;
+    })
 
     const isWideVersion = useBreakpointValue({
         base: false,
@@ -29,63 +38,75 @@ export default function UserList() {
                                 fontSize="sm"
                                 colorScheme="pink"
                                 leftIcon={<Icon as={RiAddLine} fontSize="20" />}
-                                
+
                             >
                                 Criar novo
                             </Button>
                         </Link>
                     </Flex>
 
-                    <Table colorScheme="whiteAlpha" overflowX="scroll">
-                        <Thead>
-                            <Tr>
-                                <Th px={["4", "4", "6"]} color="gray.300" width="8">
-                                    <Checkbox colorScheme="pink" disabled />
-                                </Th>
-                                <Th>Id</Th>
-                                <Th>Usuários</Th>
-                                {isWideVersion && <Th>Data de cadastro</Th>}
-                                <Th></Th>
-                            </Tr>
-                        </Thead>
-                        <Tbody>
-                            <Tr>
-                                <Td px={["4", "4", "6"]}>
-                                    <Checkbox colorScheme="pink" />
-                                </Td>
-                                <Td>01254</Td>
-                                <Td>
-                                    <Box>
-                                        <Text fontWeight="bold">Ricardo Melo Machado</Text>
-                                        <Text fontSize="sm" color="gray.300">ricardo.machado10.rm@gmail.com</Text>
-                                    </Box>
-                                </Td>
-                                {isWideVersion && <Td>06 de Dezembro, 2021</Td>}
-                                {isWideVersion && <Td>
-                                    <Box justify="space-between" align="center">
-                                        <Button as="a"
-                                            size="sm"
-                                            fontSize="sm"
-                                            colorScheme="yellow"
-                                            leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                                            mr="3"
-                                        >
-                                            Editar
-                                        </Button>
-                                        <Button as="a"
-                                            size="sm"
-                                            fontSize="sm"
-                                            colorScheme="red"
-                                            leftIcon={<Icon as={RiDeleteBinLine} fontSize="16" />}>
-                                            Excluir
-                                        </Button>
-                                    </Box>
-                                </Td>}
-                            </Tr>
-                        </Tbody>
-                    </Table>
+                    {isLoading ? (
+                        <Flex justify="center">
+                            <Spinner />
+                        </Flex>
+                    ) : error ? (
+                        <Flex justify="center">
+                            <Text>Falha ao obter dados dos usuários</Text>
+                        </Flex>
+                    ) : (
+                        <>
+                            <Table colorScheme="whiteAlpha" overflowX="scroll">
+                                <Thead>
+                                    <Tr>
+                                        <Th px={["4", "4", "6"]} color="gray.300" width="8">
+                                            <Checkbox colorScheme="pink" disabled />
+                                        </Th>
+                                        <Th>Id</Th>
+                                        <Th>Usuários</Th>
+                                        {isWideVersion && <Th>Data de cadastro</Th>}
+                                        <Th></Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    <Tr>
+                                        <Td px={["4", "4", "6"]}>
+                                            <Checkbox colorScheme="pink" />
+                                        </Td>
+                                        <Td>01254</Td>
+                                        <Td>
+                                            <Box>
+                                                <Text fontWeight="bold">Ricardo Melo Machado</Text>
+                                                <Text fontSize="sm" color="gray.300">ricardo.machado10.rm@gmail.com</Text>
+                                            </Box>
+                                        </Td>
+                                        {isWideVersion && <Td>06 de Dezembro, 2021</Td>}
+                                        {isWideVersion && <Td>
+                                            <Box justify="space-between" align="center">
+                                                <Button as="a"
+                                                    size="sm"
+                                                    fontSize="sm"
+                                                    colorScheme="yellow"
+                                                    leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
+                                                    mr="3"
+                                                >
+                                                    Editar
+                                                </Button>
+                                                <Button as="a"
+                                                    size="sm"
+                                                    fontSize="sm"
+                                                    colorScheme="red"
+                                                    leftIcon={<Icon as={RiDeleteBinLine} fontSize="16" />}>
+                                                    Excluir
+                                                </Button>
+                                            </Box>
+                                        </Td>}
+                                    </Tr>
+                                </Tbody>
+                            </Table>
 
-                    <Pagination />
+                            <Pagination />
+                        </>
+                    )}
                 </Box>
             </Flex>
         </Box>
